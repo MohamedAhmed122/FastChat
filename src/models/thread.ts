@@ -1,15 +1,15 @@
-import { IUser } from './user';
-import mongoose, { Document, Schema } from 'mongoose';
+import {IUser} from './user';
+import mongoose, {Document, Schema} from 'mongoose';
 
-interface IThread extends Document {
-  reply: string;
+export interface IThread extends Document {
+  body: string;
   timestamp: Date;
   user: IUser;
 }
 
 const threadSchema = new Schema({
-  user: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  reply: {
+  user: [{type: Schema.Types.ObjectId, ref: 'User'}],
+  body: {
     type: String,
     required: true,
   },

@@ -1,5 +1,6 @@
-import mongoose, { Document, Schema } from 'mongoose';
-import { IUser } from './user';
+import mongoose, {Document, Schema} from 'mongoose';
+import {IUser} from './user';
+import {IThread} from './thread';
 
 export interface IMessage extends Document {
   body: string;
@@ -10,12 +11,13 @@ export interface IMessage extends Document {
     isModified: boolean;
     modifiedAt?: Date;
   };
+  thread?: IThread;
 }
 
 const messageSchema = new Schema({
-  user: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  user: [{type: Schema.Types.ObjectId, ref: 'User'}],
 
-  thread: [{ type: Schema.Types.ObjectId, ref: 'Thread' }],
+  thread: [{type: Schema.Types.ObjectId, ref: 'Thread'}],
 
   body: {
     type: String,
