@@ -8,7 +8,11 @@ import http from 'http';
 import {Server} from 'socket.io';
 import {createUser, getAllUsers} from './controllers/user';
 import cors from 'cors';
-import {associateMessageWithThread, sendMessage} from './controllers/message';
+import {
+  associateMessageWithThread,
+  getMessages,
+  sendMessage,
+} from './controllers/message';
 
 const app = express();
 
@@ -55,6 +59,7 @@ io.on('connection', socket => {
       associateMessageWithThread(socket, data);
     },
   );
+  socket.on('getMessages', getMessages);
 
   socket.on('disconnect', () => {
     console.log('User Disconnected', socket.id);

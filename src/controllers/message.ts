@@ -68,3 +68,22 @@ export const associateMessageWithThread = async (
     });
   }
 };
+
+export const getMessages = async (socket: Socket) => {
+  try {
+    const messages = await Message.find()
+      .populate('user', 'firstName lastName avatar')
+      .populate({
+        path: 'thread',
+        model: 'Thread',
+        populate: {
+          path: 'user',
+          model: 'User',
+          select: 'firstName lastName avatar',
+        },
+      });
+    socket.emit('getAllMessages', messages);
+  } catch (error) {
+    console.error('Error fetching messages with details:', error);
+  }
+};
