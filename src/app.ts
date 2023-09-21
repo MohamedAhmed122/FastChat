@@ -11,6 +11,8 @@ import cors from 'cors';
 import {
   associateMessageWithThread,
   getMessages,
+  onDeleteMessage,
+  onEditMessage,
   sendMessage,
 } from './controllers/message';
 
@@ -50,6 +52,7 @@ io.on('connection', socket => {
   console.log(`User Connected: ${socket.id}`);
 
   socket.on('sendMessage', (data: {userId: string; body: string}) => {
+    console.log('sendMessage', data);
     sendMessage(socket, data);
   });
 
@@ -59,7 +62,16 @@ io.on('connection', socket => {
       associateMessageWithThread(socket, data);
     },
   );
-  socket.on('getMessages', getMessages);
+
+  socket.on('modify', (data: {messageId: string; body: string}) => {
+    onEditMessage(socket, data);
+  });
+
+  socket.on('delete', (data: {messageId: string}) => {
+    onDeleteMessage(socket, data);
+  });
+
+  socket.emit('getMessages', getMessages(socket));
 
   socket.on('disconnect', () => {
     console.log('User Disconnected', socket.id);

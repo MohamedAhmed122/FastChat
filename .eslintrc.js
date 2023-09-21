@@ -6,7 +6,6 @@ module.exports = {
       {
         files: ['*.ts', '*.tsx'],
         rules: {
-          'simple-import-sort/exports': 'error',
           '@typescript-eslint/no-shadow': ['error'],
           'no-shadow': 'off',
           'no-undef': 'off',

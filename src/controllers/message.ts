@@ -17,6 +17,8 @@ export const sendMessage = async (
 
     socket.emit('newMessage', message);
 
+    socket.emit('getMessages', getMessages(socket));
+    
     socket.emit('messageSent', {success: true});
   } catch (error) {
     console.error('Error sending message:', error);
@@ -70,6 +72,7 @@ export const associateMessageWithThread = async (
 };
 
 export const getMessages = async (socket: Socket) => {
+  console.log('here getMessages ');
   try {
     const messages = await Message.find()
       .populate('user', 'firstName lastName avatar')
@@ -82,8 +85,53 @@ export const getMessages = async (socket: Socket) => {
           select: 'firstName lastName avatar',
         },
       });
-    socket.emit('getAllMessages', messages);
+    socket.emit('getMessages', messages);
   } catch (error) {
     console.error('Error fetching messages with details:', error);
+  }
+};
+
+export const onEditMessage = async (
+  socket: Socket,
+  data: {messageId: string; body: string},
+) => {
+  // edit msg is like send msg but we just update the body and createdAt
+  const {messageId, body} = data;
+  const updatedMessage = await Message.findOneAndUpdate(
+    {_id: messageId},
+    {
+      $set: {
+        body: body,
+        modification: {
+          isModified: true,
+          modifiedAt: new Date(),
+        },
+      },
+    },
+    {new: true, returnOriginal: false},
+  );
+
+  // TODO: refactor this emit
+
+  if (updatedMessage) {
+    socket.emit('getMessages', getMessages(socket));
+  } else {
+    console.log('no mss found');
+  }
+};
+
+export const onDeleteMessage = async (
+  socket: Socket,
+  data: {messageId: string},
+) => {
+  const {messageId} = data;
+  const deletedMsg = await Message.findByIdAndDelete({_id: messageId});
+
+  console.log(deletedMsg, '--deletedMsg');
+  // TODO: refactor this emit
+  if (deletedMsg) {
+    socket.emit('getMessages', getMessages(socket));
+  } else {
+    console.log('no mss found');
   }
 };
