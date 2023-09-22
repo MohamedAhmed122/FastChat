@@ -2,7 +2,7 @@ import express from 'express';
 import connectDB from './utils/connectdb';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
-
+import multer from 'multer';
 import bodyParser from 'body-parser';
 import http from 'http';
 import {Server} from 'socket.io';
@@ -13,6 +13,8 @@ import {
   getMessages,
   sendMessage,
 } from './controllers/message';
+import {getMessagesRequest} from './controllers/messages';
+import {uploadPhoto} from './controllers/photo';
 
 const app = express();
 
@@ -27,9 +29,12 @@ connectDB();
 dotenv.config();
 
 app.use(morgan('tiny'));
+const upload = multer({dest: 'uploads/'});
 
 app.post('/api/users', createUser);
 app.get('/api/users', getAllUsers);
+app.get('/api/messages', getMessagesRequest);
+app.post('/api/photo/:userId', upload.single('avatar'), uploadPhoto);
 
 app.listen(process.env.PORT, () => {
   console.log(
@@ -69,3 +74,5 @@ io.on('connection', socket => {
 server.listen(8001, () => {
   console.log('SERVER RUNNING');
 });
+
+// 6506ea9f901a85806d167031
